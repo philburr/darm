@@ -686,6 +686,9 @@ darm_instr_t thumb2_store_single_item(darm_t *d, uint16_t w, uint16_t w2)
         if(op2 == 0) {
             d->instr_type = T_THUMB2_RN_RM_RT_REG;
             d->instr_imm_type = T_THUMB2_IMM2;
+            d->P = B_SET;
+            d->U = B_SET;
+            d->W = B_UNSET;
             return I_STRB; // register
         }
         else if((op2 & 0x3c) == 0x38) {
@@ -716,6 +719,9 @@ darm_instr_t thumb2_store_single_item(darm_t *d, uint16_t w, uint16_t w2)
         if(op2 == 0) {
             d->instr_type = T_THUMB2_RN_RM_RT_REG;
             d->instr_imm_type = T_THUMB2_IMM2;
+            d->P = B_SET;
+            d->U = B_SET;
+            d->W = B_UNSET;
             return I_STR; // register
         }
         else if((op2 & 0x3c) == 0x38) {
@@ -739,14 +745,23 @@ darm_instr_t thumb2_store_single_item(darm_t *d, uint16_t w, uint16_t w2)
 
     case 4:
         d->instr_imm_type = T_THUMB2_IMM12;
+        d->P = B_SET;
+        d->U = B_SET;
+        d->W = B_UNSET;
         return I_STRB; // immediate 12 bit
 
     case 5:
         d->instr_imm_type = T_THUMB2_IMM12;
+        d->P = B_SET;
+        d->U = B_SET;
+        d->W = B_UNSET;
         return I_STRH; // immediate 12 bit
 
     case 6:
         d->instr_imm_type = T_THUMB2_IMM12;
+        d->P = B_SET;
+        d->U = B_SET;
+        d->W = B_UNSET;
         return I_STR; // immediate 12 bit
     }
 
@@ -793,6 +808,9 @@ darm_instr_t thumb2_load_byte_hints(darm_t *d, uint16_t w, uint16_t w2)
             }
 
             d->instr_type = T_THUMB2_RN_RM_RT_REG;
+            d->P = B_SET;
+            d->U = B_SET;
+            d->W = B_UNSET;
             return I_LDRB; // register
         }
         else if((op2 & 0x24) == 0x24) {
@@ -821,6 +839,9 @@ darm_instr_t thumb2_load_byte_hints(darm_t *d, uint16_t w, uint16_t w2)
             return I_PLD; // PLD/PLDW immediate 12
         }
 
+        d->P = B_SET;
+        d->U = B_SET;
+        d->W = B_UNSET;
         return I_LDRB; // immediate 12
     }
     else if(op1 == 2) {
@@ -986,18 +1007,25 @@ darm_instr_t thumb2_load_word(darm_t *d, uint16_t w, uint16_t w2)
     d->instr_flag_type = T_THUMB2_NO_FLAG;
 
     if((op1 & 2) == 0 && Rn == b1111) {
-        d->instr_type = T_THUMB2_RT_REG;
         d->instr_imm_type = T_THUMB2_IMM12;
         d->instr_flag_type = T_THUMB2_U_FLAG;
+        d->P = B_SET;
+        d->W = B_UNSET;
         return I_LDR; // literal
     }
     else if(op1 == 1 && Rn != b1111) {
         d->instr_imm_type = T_THUMB2_IMM12;
+        d->P = B_SET;
+        d->U = B_SET;
+        d->W = B_UNSET;
         return I_LDR; // immediate
     }
     else if(op1 == 0 && Rn != b1111) {
         if(op2 == 0) { d->instr_type = T_THUMB2_RN_RM_RT_REG;
             d->instr_imm_type = T_THUMB2_IMM2;
+            d->P = B_SET;
+            d->U = B_SET;
+            d->W = B_UNSET;
             return I_LDR; // register
         }
         else if((op2 & 0x3c) == 0x30 || (op2 & 0x24) == 0x24) {

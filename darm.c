@@ -34,6 +34,17 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "darm.h"
 #include "darm-internal.h"
 
+#ifdef _MSC_VER
+#include <intrin.h>
+static uint32_t __inline __builtin_ctz(uint32_t x)
+{
+    unsigned long r = 0;
+    if (_BitScanForward(&r, x) == 0)
+        return 32;
+    return r;
+}
+#endif
+
 #define APPEND(out, ptr) \
     do { \
         const char *p = ptr; \
@@ -108,9 +119,14 @@ int darm_disasm(darm_t *d, uint16_t w, uint16_t w2, uint32_t addr)
 
     // magic table constructed based on section A6.1 of the ARM manual
     static uint8_t is_thumb2[0x20] = {
+#ifdef _MSC_VER
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
+#else
         [b11101] = 1,
         [b11110] = 1,
         [b11111] = 1,
+#endif
     };
 
     // check whether this is a Thumb or Thumb2 instruction
@@ -166,7 +182,38 @@ int darm_str(const darm_t *d, darm_str_t *str)
     // format string - we handle these instructions in a hacky way for now..
     switch (d->instr) {
     case I_CPS:
+        // TODO
+        return -1;
     case I_IT:
+        {
+            uint32_t tz = __builtin_ctz(d->mask);
+            uint32_t instr_in_it = 1 + (3 - tz);
+            uint32_t mask = d->mask >> (tz + 1);
+            uint32_t i;
+            for (i = 0; i < 3 - tz; i++)
+            {
+                if ((mask & 1) == (d->firstcond & 1))
+                {
+                    APPEND(mnemonic, "T");
+                }
+                else
+                {
+                    APPEND(mnemonic, "E");
+                }
+            }
+            APPEND(args[0], darm_condition_name(d->firstcond, 0));
+
+            *mnemonic = *shift = 0;
+            *args[0] = *args[1] = *args[2] = *args[3] = *args[4] = *args[5] = 0;
+
+            char *instr = str->total;
+            APPEND(instr, str->mnemonic);
+
+            *instr++ = ' ';
+            APPEND(instr, str->arg[0]);
+            *instr = 0;
+            return 0;
+        }
         // TODO
         return -1;
 

@@ -1009,10 +1009,16 @@ if __name__ == '__main__':
         'uxtab', 'uxtb', 'uxtah', 'uxth'
     print(type_lookup_table('type_pusr', *t_pusr))
 
-    lines = []
+    items = []
+    instructions = instruction_names(open('instructions.txt'))
+    instructions = dict([(inst, i) for i, inst in enumerate(instructions)])
+
     for instr, fmtstr in fmtstrs.items():
         fmtstr = ', '.join('"%s"' % x for x in set(fmtstr))
-        lines.append('    [I_%s] = {%s},' % (instr, fmtstr))
+        items.append((instr, '    {%s},\t\t/*I_%s*/' % (fmtstr, instr)))
+    lines = [ "    {0}," ] * len(instructions)
+    for i, txt in items:
+        lines[instructions[i]] = txt
     print('const char *armv7_format_strings[%d][3] = {' % instrcnt)
-    print('\n'.join(sorted(lines)))
+    print('\n'.join(lines))
     print('};')

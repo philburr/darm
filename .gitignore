@@ -3,6 +3,11 @@ armv7-tbl.*
 thumb-tbl.*
 thumb2-tbl.*
 libdarm.*
+darm-internal.h
 *.pyc
 *.o
 *.exe
+*.vcxproj.filters
+*.vcxproj.user
+Debug/
+Release/

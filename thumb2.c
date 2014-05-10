@@ -225,6 +225,7 @@ void thumb2_parse_imm(darm_t *d, uint16_t w, uint16_t w2)
         d->imm = (w2 >> 4) & b11;
         d->shift = d->imm;
         d->shift_type = S_LSL;
+        d->I = B_INVLD;
         break;
 
     case T_THUMB2_IMM2_IMM3:
@@ -280,6 +281,7 @@ void thumb2_parse_flag(darm_t *d, uint16_t w, uint16_t w2)
         // Type field
         // This is always a T_THUMB2_IMM2_IMM3 type
         thumb2_decode_immshift(d, (w2 >> 4) & 3, d->imm);
+        d->I = B_INVLD; d->imm = 0;
         break;
 
     case T_THUMB2_REGLIST_FLAG:
@@ -303,6 +305,7 @@ void thumb2_parse_flag(darm_t *d, uint16_t w, uint16_t w2)
         // S flag and type field
         d->S = (w >> 4) & 1 ? B_SET : B_UNSET;
         thumb2_decode_immshift(d, (w2 >> 4) & 3, d->imm);
+        d->I = B_INVLD; d->imm = 0;
         break;
 
     default:
@@ -485,6 +488,7 @@ void thumb2_parse_misc(darm_t *d, uint16_t w, uint16_t w2)
         // S flag and immediate already set
         d->T = (w2 >> 4) & 1;
         thumb2_decode_immshift(d, (w2 >> 4) & 2, d->imm);
+        d->I = B_INVLD; d->imm = 0;
         break;
 
     case I_PLI:
@@ -552,6 +556,7 @@ void thumb2_parse_misc(darm_t *d, uint16_t w, uint16_t w2)
 
     case I_SSAT: case I_USAT:
         thumb2_decode_immshift(d, (w >> 4) & 2, d->imm);
+        d->I = B_INVLD; d->imm = 0;
         d->sat_imm = w2 & 0x1f;
         break;
 

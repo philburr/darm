@@ -30,6 +30,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef __DARM__
 #define __DARM__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "armv7-tbl.h"
 
 #ifndef ARRAYSIZE
@@ -268,5 +272,9 @@ void darm_dump(const darm_t *d);
 
 int darm_str(const darm_t *d, darm_str_t *str);
 int darm_str2(const darm_t *d, darm_str_t *str, int lowercase);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
